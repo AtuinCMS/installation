@@ -76,6 +76,7 @@ class AppManagement extends BaseManagement
         $app_record->status = 'active';
         $app_record->insert();
 
+        
         // Add the class and aliases to each module config
         $this->normalizeModuleConfig($app_record);
 
