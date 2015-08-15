@@ -65,9 +65,11 @@ class AppManagement extends BaseManagement
         // 1 - Adds the Module into the database
         $app_record = new App();
         $app_record->name = $this->module->getName();
+        $app_record->description = $this->module->getDescription();
         $app_record->className = $this->module->getModuleClassName();
         $app_record->directory = $this->module->getModuleDirectory();
         $app_record->namespace = $this->module->getModuleNamespace();
+        $app_record->version = $this->module->getVersion();
         $app_record->alias = '@' . $this->module->getAlias();
         $app_record->install_date = date("Y-m-d H:i:s");
         $app_record->backend = $this->module->is_backend;
