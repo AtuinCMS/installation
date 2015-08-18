@@ -3,12 +3,9 @@ namespace atuin\installation\libraries;
 
 use amnah\yii2\user\models\User;
 use atuin\apps\models\App;
+use atuin\apps\models\ModelApp;
 use atuin\engine\helpers\AjaxResponse;
 use atuin\installation\app_installation\AppConfigManagement;
-use atuin\installation\app_installation\AppInstaller;
-use atuin\installation\app_installation\AppLoader;
-use atuin\installation\app_installation\AppManagement;
-use atuin\installation\helpers\ComposerAppHandler;
 use atuin\installation\helpers\FileSystem;
 use Yii;
 use yii\base\ErrorException;
@@ -25,7 +22,18 @@ class InstallationManager extends Object
 {
 
     protected $coreModules = [
-        'config', 'menus', 'apps', 'installation'
+        'config' => [
+            'id' => 'config'
+        ],
+        'menus' => [
+            'id' => 'menus'
+        ],
+        'apps' => [
+            'id' => 'apps'
+        ],
+        'installation' => [
+            'id' => 'installation'
+        ]
     ];
 
     protected $basicModules = [
@@ -35,6 +43,7 @@ class InstallationManager extends Object
             'namespace' => 'atuin\user'
         ],
         'atuin-routes' => [
+            'id' => 'atuin-routes',
             'composerPackage' => 'atuin/atuin-routes:dev-master',
             'namespace' => 'atuin\routes'
         ]
@@ -56,6 +65,9 @@ class InstallationManager extends Object
 
 
         // STEP 1 : CHECK IF MAIN ATUIN SUBDIRECTORY IT'S WRITABLE
+
+        // hay que chequear también que es writable vendor, noequé carpeta de console para las migrations, que exista composer.phar y si no que intente bajarlo
+        // y nosequé cosas más, podría ser útil hacer un .init para ejecutar desde comando todo a la vez también.
 
         if (!is_writable($moduleLink->getInstallationDirectory())) {
             throw new ErrorException('The Atuin base directory it\'s not writable.');
@@ -220,13 +232,17 @@ class InstallationManager extends Object
         if ($configInstalled === FALSE and Yii::$app->request->getIsAjax() === TRUE) {
             if ($executeInstallation === TRUE) {
                 try {
-                    $appLoader = new AppLoader();
 
+                    $appModel = new ModelApp();
                     // For the coreModules we will only apply the Configs
                     // because they are already installed via Composer
-                    foreach ($this->coreModules as $coreModule) {
-                        $app = $appLoader->loadApp($coreModule);
-                        AppInstaller::execute($app, [new AppConfigManagement()]);
+                    foreach ($this->coreModules as $appData) {
+//                        $app = $appLoader->loadApp($coreModule);
+//                        AppInstaller::execute($app, [new AppConfigManagement()]);
+
+                        // Installs the app using the ModelApp library.
+                        // instead of doing it manually
+                        $appModel->installAppFromData($appData, [new AppConfigManagement()]);
                     }
                 } catch (\Exception  $e) {
                     $response->setErrorMessage($e->getMessage() . $e->getTraceAsString());
@@ -242,14 +258,17 @@ class InstallationManager extends Object
         if ($coreAppsInstalled === FALSE and Yii::$app->request->getIsAjax() === TRUE) {
             if ($executeInstallation === TRUE) {
                 try {
-                    $appLoader = new AppLoader();
                     // Now we will install the basic modules, like user, routes, etc...
                     // Using right now Composer only, in the future we will be able to use another 
                     // forms of installing apps.
 
                     $data = $this->basicModules[$coreApp];
-                    $app = $appLoader->loadApp($coreApp, new ComposerAppHandler($data));
-                    AppInstaller::execute($app, [new AppManagement(), new AppConfigManagement()]);
+
+                    // Installs the app using the ModelApp library.
+                    // instead of doing it manually
+                    $appModel = new ModelApp();
+                    $appModel->installAppFromData($data);
+
                 } catch (\Exception $e) {
                     $response->setErrorMessage($e->getMessage());
                 }

@@ -10,7 +10,6 @@ use atuin\config\models\ModelConfig;
 use atuin\engine\helpers\Filters;
 use atuin\installation\app_installation\helpers\ConfigFilesManager;
 use atuin\installation\app_installation\helpers\FactoryCommandHelper;
-use atuin\menus\model\ModelMenus;
 use atuin\menus\models\ModelMenuItem;
 use cyneek\yii2\menu\models\MenuItems;
 use League\Flysystem\Adapter\Local as Adapter;

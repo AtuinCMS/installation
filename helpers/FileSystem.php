@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Pat
- * Date: 08/07/2015
- * Time: 18:04
- */
 
 namespace atuin\installation\helpers;
 
