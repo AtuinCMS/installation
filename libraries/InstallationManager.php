@@ -67,7 +67,9 @@ class InstallationManager extends Object
         // STEP 1 : CHECK IF MAIN ATUIN SUBDIRECTORY IT'S WRITABLE
 
         // hay que chequear también que es writable vendor, noequé carpeta de console para las migrations, que exista composer.phar y si no que intente bajarlo
-        // y nosequé cosas más, podría ser útil hacer un .init para ejecutar desde comando todo a la vez también.
+        // y nosequé cosas más, podría ser útil hacer un .ini 
+        // hay que chequear también que es writable vendor, nosequÃ© carpeta de console para las migrations, que exista composer.phar y si no que intente bajarlo
+        // y nosequÃ© mÃ¡s cosas, podrÃ­a ser Ãºtil hacer un .init para ejecutar desde comando todo a la vez tambiÃ©n
 
         if (!is_writable($moduleLink->getInstallationDirectory())) {
             throw new ErrorException('The Atuin base directory it\'s not writable.');
