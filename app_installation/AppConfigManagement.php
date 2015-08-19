@@ -167,6 +167,10 @@ class AppConfigManagement extends BaseManagement
         }
     }
 
+    /**
+     * Copies the App routes into their defined location in atuin directory.
+     * 
+     */
     protected function upRoutes()
     {
         $basePath = dirname(Yii::$app->getVendorPath());
@@ -199,6 +203,17 @@ class AppConfigManagement extends BaseManagement
         }
     }
 
+    /**
+     * Same as upRoutes, since they are full files with all their information
+     */
+    protected function updateRoutes()
+    {
+        $this->upRoutes();
+    }
+
+    /**
+     * Deletes the App routes in their atuin directory.
+     */
     protected function downRoutes()
     {
         $fileHelper = new yii\helpers\FileHelper();
@@ -218,32 +233,52 @@ class AppConfigManagement extends BaseManagement
         }
     }
 
-
+    /**
+     * Executes the migration of all the App's database info. First tries to install every
+     * migration inside the /migrations directory. Then executes the code inside the migration
+     * methods of the AtuinConfig file. 
+     * 
+     * @return bool
+     * @throws yii\base\Exception
+     * @throws yii\db\Exception
+     */
     protected function executeMigration()
     {
         $transaction = Yii::$app->db->beginTransaction();
 
         try
         {
-            // First we will try to search for migration files at the Apps' migration subdirectory.
-            $baseDirectoryList = [];
-            $baseDirectoryList[] = $this->module->getModuleDirectory();
-
-            if (method_exists($this->module, 'getComposerPackageData'))
+            /**
+             * Migration based in the Yii2 Migration System (only applies for up and down since 
+             * it doesn't have support for updates).
+             */
+            
+            if ($this->preMethod != 'update')
             {
-                $baseDirectoryList[] = Yii::$app->getVendorPath() . '/' . $this->module->getComposerPackageData(TRUE);
-            }
-
-            foreach ($baseDirectoryList as $baseDirectory)
-            {
-                $filesystem = new Filesystem(new Adapter($baseDirectory));
-
-                if ($filesystem->has($this->module->getMigrationsDirectory()) && FactoryCommandHelper::migration()->check())
+                // First we will try to search for migration files at the Apps' migration subdirectory.
+                $baseDirectoryList = [];
+                $baseDirectoryList[] = $this->module->getModuleDirectory();
+    
+                if (method_exists($this->module, 'getComposerPackageData'))
                 {
-                    FactoryCommandHelper::migration()->execute($baseDirectory . '/' . $this->module->getMigrationsDirectory(), $this->preMethod);
+                    $baseDirectoryList[] = Yii::$app->getVendorPath() . '/' . $this->module->getComposerPackageData(TRUE);
+                }
+    
+                foreach ($baseDirectoryList as $baseDirectory)
+                {
+                    $filesystem = new Filesystem(new Adapter($baseDirectory));
+    
+                    if ($filesystem->has($this->module->getMigrationsDirectory()) && FactoryCommandHelper::migration()->check())
+                    {
+                        FactoryCommandHelper::migration()->execute($baseDirectory . '/' . $this->module->getMigrationsDirectory(), $this->preMethod);
+                    }
                 }
             }
 
+            /**
+             * Migration based in the AtuinConfig file, will be called in every action, including updates.
+             */
+            
             $methodParams = NULL;
 
             // Declare the parameters passed into the method
