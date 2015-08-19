@@ -50,6 +50,8 @@ class AppManagement extends BaseManagement
     }
 
     /**
+     * Installing the App data
+     * 
      * @return App
      * @throws \Exception
      * @throws yii\base\Exception
@@ -65,6 +67,7 @@ class AppManagement extends BaseManagement
         // 1 - Adds the Module into the database
         $app_record = new App();
         $app_record->name = $this->module->getName();
+        $app_record->app_id = $this->module->getId();
         $app_record->description = $this->module->getDescription();
         $app_record->className = $this->module->getModuleClassName();
         $app_record->directory = $this->module->getModuleDirectory();
@@ -84,8 +87,32 @@ class AppManagement extends BaseManagement
 
         return $app_record;
     }
+    
+    
+    public function updateModule()
+    {
+        /** @var App $app_record */
+        $app_record = App::findOne(['app_id' => $this->module->getId()]);
+        
+        // Updates the basic module data
+        $app_record->name = $this->module->getName();
+        $app_record->app_id = $this->module->getId();
+        $app_record->description = $this->module->getDescription();
+        $app_record->className = $this->module->getModuleClassName();
+        $app_record->directory = $this->module->getModuleDirectory();
+        $app_record->namespace = $this->module->getModuleNamespace();
+        $app_record->version = $this->module->getVersion();
+        $app_record->alias = '@' . $this->module->getAlias();
+        $app_record->backend = $this->module->is_backend;
+        $app_record->frontend = $this->module->is_frontend;
+        $app_record->core_module = $this->module->is_core_module;
+        
+        $app_record->update();
+    }
 
     /**
+     * Deleting the App data from databases 
+     * 
      * @throws \Exception
      * @throws yii\base\Exception
      */
@@ -120,7 +147,7 @@ class AppManagement extends BaseManagement
         Filters::registerAction([Config::className(), Config::EVENT_AFTER_INSERT], [$appConnectionsModel, 'insertConnectionFromFilter'], $app_record);
         
         // Adds the class to the module config
-        ModelConfig::addConfig(NULL, 'modules', $app_record->name, 'class', $app_record->className, FALSE);
+        ModelConfig::addConfig(NULL, 'modules', $app_record->app_id, 'class', $app_record->className, FALSE);
         
         // Adds the alias to the module config
         ModelConfig::addConfig(NULL, 'aliases', NULL, $app_record->alias, $app_record->directory, FALSE);

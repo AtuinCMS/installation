@@ -20,7 +20,6 @@ abstract class BaseManagement
     /** @var string */
     public $parentClass = 'atuin\skeleton\Module';
 
-
     /** @var string */
     protected $preMethod;
 

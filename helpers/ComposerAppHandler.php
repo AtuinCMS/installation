@@ -39,7 +39,7 @@ class ComposerAppHandler extends BaseAppHandler
      * Gets the App using ProcessComposerHelper.
      * If there is any problem getting it, will throw an Exception and delete the downloaded data.
      * 
-     * Uses Web First phylosophy, so could use manual installation instead of Composer libraries.
+     * Uses Web First phylosophy, so could use another type of installation instead of Composer.
      * 
      * @throws \Exception
      * @throws yii\base\Exception
@@ -57,6 +57,32 @@ class ComposerAppHandler extends BaseAppHandler
         } catch (yii\base\Exception  $e)
         {
             $this->deleteApp();
+            throw $e;
+        }
+    }
+
+    /**
+     * Updates the App using ProcessComposerHelper.
+     * If there is any problem getting it, will throw an Exception.
+     * 
+     * Uses Web First phylosophy, so there should come with another type of installator instead of
+     * Composer.
+     * 
+     * @throws \Exception
+     * @throws yii\base\Exception
+     */
+    public function updateApp()
+    {
+        try
+        {
+            // Composer installation
+            if (FactoryCommandHelper::composer()->check())
+            {
+                FactoryCommandHelper::composer()->execute($this->composerPackage, 'update');
+            }
+
+        } catch (yii\base\Exception  $e)
+        {
             throw $e;
         }
     }

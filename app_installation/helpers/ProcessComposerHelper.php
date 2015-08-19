@@ -52,8 +52,8 @@ class ProcessComposerHelper extends CommandHelper
         $builder = $this->prepareBuilder();
         $builder->add('clear-cache');
         $this->runProccess($builder);
-        
-        
+
+
         // 2 - Make the proper composer execution now that the
         // cache should be cleared (note that this can not be really true
         // people has reported that some .cache dirs may still remain
@@ -63,8 +63,14 @@ class ProcessComposerHelper extends CommandHelper
         if ($type == 'up')
         {
             $builder->add('require');
-            $builder->add('--prefer-dist');
-        } else
+            $builder->add('--prefer-source');
+        }
+        elseif ($type == 'update')
+        {
+            $builder->add('update');
+            $builder->add('--prefer-source');
+        }
+        else
         {
             $builder->add('remove');
         }

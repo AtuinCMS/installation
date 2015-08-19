@@ -49,4 +49,5 @@ abstract class BaseAppHandler extends Component
     
     public abstract function deleteApp();
 
+    public abstract function updateApp();
 }

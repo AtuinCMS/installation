@@ -93,4 +93,29 @@ class AppLoader
 
     }
 
+    /**
+     * Updates the selected app.
+     *
+     * @param $appIdentifier
+     * @param BaseAppHandler $appHandler
+     * @return null|yii\base\Module
+     * @throws \Exception
+     * @throws yii\base\Exception
+     */
+    public function updateApp($appIdentifier, BaseAppHandler $appHandler)
+    {
+        try
+        {
+            // 1 - Updates the App code
+            $appHandler->updateApp();
+
+            // 2 - Reloads the Module because there will be new data neccesary to 
+            // implement in the new installation
+            return $this->getModule($appHandler->id, $appHandler->namespace, $appHandler->directory);
+        } catch (yii\base\Exception $e)
+        {
+            throw $e;
+        }
+    }
+
 }
