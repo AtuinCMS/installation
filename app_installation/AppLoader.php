@@ -22,7 +22,7 @@ class AppLoader
      * @param $AppId
      * @param $appNameSpace
      * @param $appLocation
-     * @return null|yii\base\Module
+     * @return null|\atuin\skeleton\Module
      * @throws yii\base\Exception
      */
     public function getModule($AppId, $appNameSpace, $appLocation)
@@ -31,15 +31,12 @@ class AppLoader
         // 1 - try to load the app Module File.
         $className = $appNameSpace . '\Module';
 
-        if (!class_exists($className))
-        {
-            if (file_exists($appLocation . '/Module.php'))
-            {
+        if (!class_exists($className)) {
+            if (file_exists($appLocation . '/Module.php')) {
                 include_once($appLocation . '/Module.php');
             }
 
-            if (!class_exists($className))
-            {
+            if (!class_exists($className)) {
                 throw new yii\base\Exception('Class ' . $className . ' doesn\'t exist. Maybe bad Namespace given?');
             }
 
@@ -67,7 +64,7 @@ class AppLoader
      *
      * @param $appIdentifier
      * @param NULL|BaseAppHandler $appHandler
-     * @return null|yii\base\Module
+     * @return null|\atuin\skeleton\Module
      * @throws \Exception
      * @throws yii\base\Exception
      */
@@ -77,17 +74,14 @@ class AppLoader
         // 1 - Checks if the app it's already declared as a Yii2 module and if that's the case
         // will return it.
 
-        if (!is_null(Yii::$app->getModule($appIdentifier)))
-        {
+        if (!is_null(Yii::$app->getModule($appIdentifier))) {
             return Yii::$app->getModule($appIdentifier);
         }
-        try
-        {
+        try {
             $appHandler->getApp();
 
             return $this->getModule($appHandler->id, $appHandler->namespace, $appHandler->directory);
-        } catch (yii\base\Exception $e)
-        {
+        } catch (\Exception $e) {
             throw $e;
         }
 
@@ -98,24 +92,37 @@ class AppLoader
      *
      * @param $appIdentifier
      * @param BaseAppHandler $appHandler
-     * @return null|yii\base\Module
+     * @return null|\atuin\skeleton\Module
      * @throws \Exception
      * @throws yii\base\Exception
      */
-    public function updateApp($appIdentifier, BaseAppHandler $appHandler)
+    public function updateApp(BaseAppHandler $appHandler)
     {
-        try
-        {
+        try {
             // 1 - Updates the App code
             $appHandler->updateApp();
 
             // 2 - Reloads the Module because there will be new data neccesary to 
             // implement in the new installation
             return $this->getModule($appHandler->id, $appHandler->namespace, $appHandler->directory);
-        } catch (yii\base\Exception $e)
-        {
+        } catch (\Exception $e) {
             throw $e;
         }
     }
 
+    /**
+     * Deletes the app whose App Handler has been sent via parameter.
+     *
+     * @param $appIdentifier
+     * @param BaseAppHandler $appHandler
+     * @throws \Exception
+     */
+    public function deleteApp(BaseAppHandler $appHandler)
+    {
+        try {
+            $appHandler->deleteApp();
+        } catch (\Exception $e) {
+            throw $e;
+        }
+    }
 }

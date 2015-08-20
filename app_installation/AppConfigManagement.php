@@ -10,6 +10,7 @@ use atuin\config\models\ModelConfig;
 use atuin\engine\helpers\Filters;
 use atuin\installation\app_installation\helpers\ConfigFilesManager;
 use atuin\installation\app_installation\helpers\FactoryCommandHelper;
+use atuin\menus\models\MenuItem;
 use atuin\menus\models\ModelMenuItem;
 use cyneek\yii2\menu\models\MenuItems;
 use League\Flysystem\Adapter\Local as Adapter;
@@ -375,7 +376,7 @@ class AppConfigManagement extends BaseManagement
 
         $appConnectionsModel = new ModelAppConnections();
 
-        Filters::registerAction([MenuItems::className(), Config::EVENT_AFTER_INSERT], [$appConnectionsModel, 'insertConnectionFromFilter'], $this->app);
+        Filters::registerAction([MenuItem::className(), MenuItem::EVENT_AFTER_INSERT], [$appConnectionsModel, 'insertConnectionFromFilter'], $this->app);
 
         // Deleting manually the already assigned menus
         if ($this->preMethod == 'down')
@@ -395,7 +396,7 @@ class AppConfigManagement extends BaseManagement
 
         call_user_func([$this->installationObject, $this->preMethod . 'Menu'], $methodParams);
 
-        Filters::unRegisterAction([Config::className(), Config::EVENT_AFTER_INSERT]);
+        Filters::unRegisterAction([MenuItem::className(), MenuItem::EVENT_AFTER_INSERT]);
     }
 
 
